@@ -1,0 +1,6 @@
+projectKey=es.codeurjc.ais:l.uzquiano.2021-j.romerog.2021
+serverUrl=http://localhost:9000
+serverVersion=10.4.1.88267
+dashboardUrl=http://localhost:9000/dashboard?id=es.codeurjc.ais%3Al.uzquiano.2021-j.romerog.2021
+ceTaskId=97e2a47b-5f03-42a5-814b-e024e7c20a5a
+ceTaskUrl=http://localhost:9000/api/ce/task?id=97e2a47b-5f03-42a5-814b-e024e7c20a5a

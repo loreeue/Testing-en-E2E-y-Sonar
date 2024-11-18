@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilmWebController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">l.uzquiano.2021-j.romerog.2021</a> &gt; <a href="index.source.html" class="el_package">es.codeurjc.ais.nitflex.web</a> &gt; <span class="el_source">FilmWebController.java</span></div><h1>FilmWebController.java</h1><pre class="source lang-java linenums">package es.codeurjc.ais.nitflex.web;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
+
+import es.codeurjc.ais.nitflex.film.Film;
+import es.codeurjc.ais.nitflex.film.FilmService;
+
+@Controller
+<span class="fc" id="L20">public class FilmWebController {</span>
+	public static final String FILMS = &quot;films&quot;;
+	public static final String MESSAGE = &quot;message&quot;;
+
+	@Autowired
+	private FilmService filmService;
+	
+	@GetMapping(&quot;/&quot;)
+	public String showFilms(Model model) {
+
+<span class="fc" id="L30">		model.addAttribute(FILMS, filmService.findAll());</span>
+		
+<span class="fc" id="L32">		return FILMS;</span>
+	}
+	
+	@GetMapping(&quot;/films/{id}&quot;)
+	public String showFilm(Model model, @PathVariable long id) {
+		
+<span class="fc" id="L38">		Optional&lt;Film&gt; op = filmService.findOne(id);</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">		if(op.isPresent()) {</span>
+<span class="fc" id="L40">			Film film = op.get();</span>
+<span class="fc" id="L41">			model.addAttribute(&quot;film&quot;, film);</span>
+<span class="fc" id="L42">			return &quot;film&quot;;</span>
+		}else {
+<span class="nc" id="L44">			return FILMS;</span>
+		}
+		
+	}
+	
+	@GetMapping(&quot;/removefilm/{id}&quot;)
+	public String removeFilm(Model model, @PathVariable long id) {
+		
+<span class="fc" id="L52">		Optional&lt;Film&gt; op = filmService.findOne(id);</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">		if(op.isPresent()) {</span>
+<span class="fc" id="L54">			filmService.delete(id);</span>
+<span class="fc" id="L55">			Film removedFilm = op.get();</span>
+<span class="fc" id="L56">			model.addAttribute(&quot;error&quot;, false);</span>
+<span class="fc" id="L57">			model.addAttribute(MESSAGE, &quot;Film '&quot;+removedFilm.getTitle()+&quot;' deleted&quot;);</span>
+<span class="fc" id="L58">			return MESSAGE;</span>
+		}else {
+<span class="nc" id="L60">			return &quot;redirect:/&quot;;</span>
+		}
+		
+	}
+	
+	@GetMapping(&quot;/newfilm&quot;)
+	public String newFilm(Model model) {
+<span class="fc" id="L67">		return &quot;newFilmPage&quot;;</span>
+	}
+	
+	@PostMapping(&quot;/createfilm&quot;)
+	public String newBookProcess(Film film) {
+		
+<span class="fc" id="L73">		Film newFilm = filmService.save(film);</span>
+		
+<span class="fc" id="L75">		return &quot;redirect:/films/&quot; + newFilm.getId();</span>
+	}
+	
+	@GetMapping(&quot;/editfilm/{id}&quot;)
+	public String editBook(Model model, @PathVariable long id) {
+		
+<span class="fc" id="L81">		Optional&lt;Film&gt; op = filmService.findOne(id);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">		if(op.isPresent()) {</span>
+<span class="fc" id="L83">			Film film = op.get();</span>
+<span class="fc" id="L84">			model.addAttribute(&quot;film&quot;, film);</span>
+<span class="fc" id="L85">			return &quot;editFilmPage&quot;;</span>
+		}else {
+<span class="nc" id="L87">			return FILMS;</span>
+		}
+		
+	}
+	
+	@PostMapping(&quot;/editfilm&quot;)
+	public String editBookProcess(Model model, Film film) {
+		
+<span class="nc" id="L95">		filmService.save(film);</span>
+
+<span class="nc" id="L97">		model.addAttribute(&quot;film&quot;, film);</span>
+		
+<span class="nc" id="L99">		return &quot;redirect:/films/&quot; + film.getId();</span>
+	}
+
+	// Cuando se produce una excepción 'ResponseStatusException' se ejecuta este método
+	// -&gt; Devuelve una vista con un mensaje 
+	@ExceptionHandler({ResponseStatusException.class, BindException.class})
+    public ModelAndView handleException(Exception ex){
+<span class="nc" id="L106">        ModelAndView modelAndView = new ModelAndView();</span>
+<span class="nc" id="L107">        modelAndView.setViewName(MESSAGE);</span>
+<span class="nc" id="L108">		modelAndView.addObject(&quot;error&quot;, true);</span>
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">		if(ex instanceof ResponseStatusException resExp){</span>
+<span class="nc" id="L111">			modelAndView.addObject(MESSAGE, resExp.getReason());</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">		}else if(ex instanceof BindException){</span>
+<span class="nc" id="L113">			modelAndView.addObject(MESSAGE, &quot;Field 'year' must be a number&quot;);</span>
+		}else{
+<span class="nc" id="L115">			modelAndView.addObject(MESSAGE, ex.getMessage());</span>
+		}
+
+<span class="nc" id="L118">        return modelAndView;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
